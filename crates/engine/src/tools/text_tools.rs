@@ -237,8 +237,8 @@ fn core_text_read(ctx: &mut Ctx<'_>, params: Value) -> Result<ToolOutput, ToolEr
 mod tests {
     use super::super::native_common::test_support::{call, call_err, engine_with};
     use super::{PAGE_BYTES, SNIFF};
-    use crate::target::looks_like_text;
     use crate::Engine;
+    use crate::target::looks_like_text;
     use craft_anything_evidence::ErrorCode;
     use craft_anything_testkit::temp_file;
     use serde_json::json;
