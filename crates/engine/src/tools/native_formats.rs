@@ -526,7 +526,7 @@ fn non_native_triage(t: &Target) -> (String, Vec<&'static str>, Vec<(&'static st
             (format!("{n} is a SQLite database (how an app stores its data)."), vec!["core", "database"], vec![("db_sqlite_show", "tables, schema and rows")])
         }
         // A script, notes or settings: read as text, not as bytes (#539).
-        TargetKind::Unknown if super::text_tools::looks_like_text(&t.bytes) => (
+        TargetKind::Text => (
             format!("{n} is a text file (a script, notes or settings)."),
             vec!["core"],
             vec![(super::text_tools::TEXT_READ_TOOL, "read it as text, a page at a time"), ("native_bytes_find", "search it for a word or bytes")],
@@ -823,7 +823,8 @@ mod tests {
         // #539: text is sent to the text reader, not to the byte tools that refuse it.
         let text = engine_with("notes.txt", b"plain text");
         let r = call(&text, "core_target_triage", json!({}));
-        assert_eq!(r["result"]["kind"], "unknown");
+        assert_eq!(r["result"]["kind"], "text");
+        assert_eq!(r["result"]["description"], "A text file (notes, source code or settings)");
         assert!(r["summary"].as_str().unwrap().contains("is a text file"));
         assert_eq!(r["result"]["next_steps"][0]["tool"], "core_text_read");
         assert!(!r["limitations"].as_array().unwrap().iter().any(|l| l["code"] == "native_parse_failed"));
