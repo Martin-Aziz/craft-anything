@@ -1513,7 +1513,7 @@ Owner: open · Status: in progress
 - [ ] A text file is still "A file we don't recognise yet" everywhere but triage's answer: the
       target's kind stays `unknown`, so `core_targets_list` and triage's `description` say so, and
       Codex tried `core_overview_show` on a `.md` before triage. Give text its own target kind (or
-      description) so the list and the app call it text
+      description) so the list and the app call it text — claimed: Martin-Aziz, branch bugfix/r3.11-text-target-kind
 
 ### R3.12 Format parser correctness
 Owner: open · Status: in progress

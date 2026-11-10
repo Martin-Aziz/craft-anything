@@ -2221,6 +2221,7 @@ pub fn kind_icon(k: TargetKind) -> &'static str {
         TargetKind::Zip | TargetKind::Asar => "package",
         TargetKind::Directory => "folder",
         TargetKind::Script => "file-code",
+        TargetKind::Text => "file",
         TargetKind::NetworkCapture => "network",
         TargetKind::Plist => "list-tree",
         TargetKind::Evm => "zap",

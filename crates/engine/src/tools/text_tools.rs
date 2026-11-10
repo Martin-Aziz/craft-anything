@@ -136,30 +136,6 @@ fn utf16(bytes: &[u8], unit: fn([u8; 2]) -> u16) -> (String, usize) {
     (text, replaced)
 }
 
-/// Whether a file triage doesn't recognise looks like text a person or a program wrote: it has a
-/// UTF-16 or UTF-8 mark, or its start is valid UTF-8 with no zero bytes and few control
-/// characters. An empty file isn't text.
-pub fn looks_like_text(bytes: &[u8]) -> bool {
-    if bytes.starts_with(b"\xEF\xBB\xBF") || bytes.starts_with(b"\xFF\xFE") || bytes.starts_with(b"\xFE\xFF") {
-        return true;
-    }
-    let head = bytes.get(..bytes.len().min(SNIFF)).unwrap_or_default();
-    if head.is_empty() || head.contains(&0) {
-        return false;
-    }
-    let cut_at_end = bytes.len() > SNIFF;
-    let mut chunks = head.utf8_chunks().peekable();
-    while let Some(chunk) = chunks.next() {
-        // The window may end inside a character; only that last sequence may be incomplete.
-        let last = chunks.peek().is_none();
-        if !chunk.invalid().is_empty() && !(last && cut_at_end && chunk.invalid().len() < 4) {
-            return false;
-        }
-    }
-    let control = head.iter().filter(|b| b.is_ascii_control() && !matches!(b, b'\t' | b'\n' | b'\r' | 0x0c | 0x1b)).count();
-    control.saturating_mul(100) <= head.len()
-}
-
 /// One page of lines: the text, how many lines it holds, the 1-based numbers of lines cut to
 /// their start, and whether the page's byte limit (not `limit`) ended it.
 struct Page {
@@ -260,7 +236,8 @@ fn core_text_read(ctx: &mut Ctx<'_>, params: Value) -> Result<ToolOutput, ToolEr
 #[cfg(test)]
 mod tests {
     use super::super::native_common::test_support::{call, call_err, engine_with};
-    use super::{PAGE_BYTES, SNIFF, looks_like_text};
+    use super::{PAGE_BYTES, SNIFF};
+    use crate::target::looks_like_text;
     use crate::Engine;
     use craft_anything_evidence::ErrorCode;
     use craft_anything_testkit::temp_file;
